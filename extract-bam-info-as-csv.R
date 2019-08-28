@@ -1,3 +1,5 @@
+# To run: Rscript extract-bam-info-as-csv.R path/to/file.bam
+
 main <- function() {
   
   args <- commandArgs(trailingOnly = TRUE)
@@ -51,7 +53,7 @@ main <- function() {
                                                              is.na(nbrSupplementaryAlignments), 0))
   
 
-  write.csv(tmp, file = paste(deparse(substitute(bamfile)),"_output.csv"))
+  write.csv(tmp, file = "output.csv")
 }
 
 main()
