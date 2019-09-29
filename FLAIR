@@ -1,0 +1,27 @@
+# Correct mapped reads:
+# Human
+python flair/flair.py correct \
+-c genomes/GRCh38_EBV.chrom.sizes.tsv \
+-f genomes/gencode.v31.annotation.gtf \
+-g genomes/hg38.fa \
+-q guppy/bam_files/diffx_primary.bed12 \
+-o diffx_primary
+
+# Sequins
+python flair/flair.py correct \
+-c genomes/sequin.chrom.sizes.tsv \
+-f genomes/rnasequin_annotation_2.2.gtf \
+-g genomes/rnasequin_decoychr_2.2.fa \
+-q guppy/bam_files_sequin_genome/diffx_primary_sequin.bed12 \
+-o _diffx_sequin_primary
+
+# Combine into diff and undiff for human and sequin:
+cat diff*_corrected.psl > diff.psl 
+cat undiff*_corrected.psl > undiff.psl
+
+# Collapse:
+# Human
+python flair/flair.py collapse -t 16 -f genomes/gencode.v31.annotation.gtf -r guppy/all_pass.fastq -q diff_corrected.psl -g genomes/hg38.fa -o diff_collapsed
+
+# Sequins
+python flair/flair.py collapse  -f genomes/rnasequin_annotation_2.2.gtf -r guppy/sequin_pass.fa -q diff_sequin_corrected.psl -g genomes/rnasequin_decoychr_2.2.fa -o diff_sequin_collapsed
