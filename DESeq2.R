@@ -5,7 +5,6 @@ library("pheatmap")
 library("pcaExplorer")
 library("ggplot2")
 
-
 #Import data
 countdata <- read.table("norm_counts.txt", header=TRUE, row.names=1)
 
