@@ -1,0 +1,5 @@
+# to genome
+minimap2 -ax splice -uf -k14 GRCh38-hg38.fasta guppy/sample/pass.fastq > sample.sam
+
+# to transcriptome
+minimap2 -ax splice -uf -k14 GRCh38.cDNA.ncRNA.all.fasta guppy/sample/pass.fastq > sample.sam
