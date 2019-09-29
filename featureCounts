@@ -1,0 +1,5 @@
+# count human genes
+featureCounts -L -a genomes/gencode.v31.annotation.gtf -o featCounts_human guppy/diff2/diff2.sam guppy/diff3tr1/diff3tr1.sam guppy/diff3tr2/diff3tr2.sam guppy/diff4/diff4.sam guppy/undiff3/undiff3.sam guppy/undiff4/undiff4.sam
+
+# count sequin genes
+featureCounts -L -a genomes/rnasequin_annotation_2.2.gtf -o featCounts_sequins guppy/diff2/diff2.sam guppy/diff3tr1/diff3tr1.sam guppy/diff3tr2/diff3tr2.sam guppy/diff4/diff4.sam guppy/undiff3/undiff3.sam guppy/undiff4/undiff4.sam
