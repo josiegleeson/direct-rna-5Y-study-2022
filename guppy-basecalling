@@ -1,0 +1,1 @@
+guppy_basecaller -r -l 2018_dirRNA -s 2019_recall_Guppy3.0.3 --kit SQK-RNA001 --flowcell FLO-MIN106 --num_callers 1 --device "cuda:0 cuda:1" --calib_detect --qscore_filtering
