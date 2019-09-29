@@ -1,0 +1,6 @@
+# need to do for all samples 
+# Human transcripts
+salmon quant -t GRCh38.cDNA.ncRNA.all.fasta -l -a ../guppy/diff2/diff2.bam -o ../guppy/salmon_transcripts_quantify/diff2_human
+
+#Sequin transcripts
+salmon quant -t rnas_equins.fasta -l -a ../guppy/diff2/diff2.bam -o ../guppy/salmon_transcripts_quantify/diff2_sequins
