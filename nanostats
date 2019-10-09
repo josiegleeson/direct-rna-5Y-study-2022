@@ -1,0 +1,5 @@
+# program used for plotting and data summary of fastq files
+
+Nanoplot --fastq Diff2_pass.fastq --plots hex dot
+
+NanoStat --fastq Diff2_pass.fastq --outdir Diff2_stats
