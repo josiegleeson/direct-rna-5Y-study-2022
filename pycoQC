@@ -1,3 +1,6 @@
+# After downloading pycoQC with Anaconda the following scripts were run in jupyter notebook to produce the figures
+# pycoQC version 2.2.3
+
 from pycoQC.pycoQC import pycoQC
 from plotly.offline import plot, iplot, init_notebook_mode
 init_notebook_mode (connected=False)
@@ -6,7 +9,7 @@ import numpy
 import csv
 
 # import summary text file
-p = pycoQC("/Users/JosieGleeson/Documents/UniMelb/Research/guppy/combined_summary.txt")
+p = pycoQC("/Users/JosieGleeson/Documents/sequencing_summary.txt")
 print (p)
 
 # 2D length v quality plot
