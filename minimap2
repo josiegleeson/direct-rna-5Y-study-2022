@@ -1,0 +1,15 @@
+# minimap2 version 2.17-r941
+# Generated 4 separate SAM files for each sample
+
+
+# to human genome
+minimap2 -ax splice -uf -k14 GRCh38.hg38.fasta sample/pass.fastq > sample.sam
+
+# to human transcriptome
+minimap2 -ax splice -uf -k14 GRCh38.cDNA.ncRNA.all.fasta sample/pass.fastq > sample.sam
+
+# to sequin genome
+minimap2 -ax splice -uf -k14 rna_sequins_decoy_chrIS.fasta sample/pass.fastq > sample_sequins.sam
+
+# to sequin transcriptome
+minimap2 -ax splice -uf -k14 rna_sequins_transcripts.fasta sample/pass/fastq > sample_sequins.sam
