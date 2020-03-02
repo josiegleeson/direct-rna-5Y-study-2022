@@ -1,12 +1,14 @@
+# Performing differential expression analysis with DESeq2 (v1.26.0)
+
 library(DESeq2)
 library(RColorBrewer)
 library(gplots)
-library("pheatmap")
-library("pcaExplorer")
-library("ggplot2")
+library(pheatmap)
+library(pcaExplorer)
+library(ggplot2)
 
 #Import data
-countdata <- read.table("norm_counts.txt", header=TRUE, row.names=1)
+countdata <- read.table("counts.txt", header=TRUE, row.names=1)
 
 #remove extra columns of data from featureCounts
 countdata <- countdata[ ,6:ncol(countdata)]
@@ -18,19 +20,19 @@ countdata <- as.matrix(countdata)
 (condition <- factor(c(rep("Differentiated", 3), rep("Undifferentiated", 2))))
 
 # Create coldata frame and make DESeq Dataset
-(coldata <- data.frame(row.names=colnames(countdata), condition))
+coldata <- data.frame(row.names=colnames(countdata), condition)
 
 dds <- DESeqDataSetFromMatrix(countData=countdata, colData=coldata, design=~condition)
 
-# Optional filtering step to remove very low counts
-keep <- rowSums(counts(dds)) >= min_count
+# Optional filtering step to remove very low counts (less than 5 shown here)
+keep <- rowSums(counts(dds)) >= 5
 dds <- dds[keep,]
 
-# Run DESeq2 pipeline and save results
+# Run DESeq2 pipeline and get results
 dds <- DESeq(dds)
 res <- results(dds)
 
-# Save normalised counts separately 
+# Save normalised counts separately if desired
 norm_counts <- as.data.frame(counts(dds, normalized=TRUE))
 write.csv(norm_counts, file="norm_counts.txt")
 
