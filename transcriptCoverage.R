@@ -7,13 +7,12 @@ library(GenomicFeatures)
 gencode <- makeTxDbFromGFF(file="gencode.v31.primary_assembly.annotation.gtf", format="gtf", dataSource="gencode", organism="Homo sapiens")
 gencodeLengths <- transcriptLengths(gencode, with.cds_len=TRUE, with.utr5_len=TRUE, with.utr3_len=TRUE)
 lengths <- data.frame(gencodeLengths$tx_name, gencodeLengths$tx_len)
-write.csv(lengths, file="gencode_lengths.csv")
 
-# Import all 
-all <- read.csv(file = "5y-all.csv", header = TRUE, na.strings="#N/A")
+# Import 5Y data from previous extractDataFromBam script 
+all_5y <- read.csv(file = "5y-all.csv", header = TRUE, na.strings="#N/A")
 
 # Merge files by transcript name for each length
-merged <- merge(all, lengths, by.x = "transcriptName", by.y = "gencodeLengths.tx_name", all.x = TRUE)
+merged <- merge(all_5y, lengths, by.x = "transcriptName", by.y = "gencodeLengths.tx_name", all.x = TRUE)
 merged <- na.omit(merged)
 
 # coverage = width / known length
@@ -28,7 +27,7 @@ merged <- merged %>%
 merged$gencodeLengths.tx_len <- cut(merged$gencodeLengths.tx_len, breaks=c(0,500,1000,1500,2000,200000), right=FALSE, dig.lab = 5)
 merged$gencodeLengths.tx_len <- as.factor(merged$gencodeLengths.tx_len)
 
-# violin plot
+# violin plot of coverage of annotated transcript grouped by length of annotated transcript
 q <- merged %>%
   plot_ly(
     x = ~gencodeLengths.tx_len,
@@ -53,7 +52,7 @@ q <- merged %>%
   )
 q
 
-# violin plot of proportionaligned
+# violin plot of proportion aligned
 p <- merged %>%
   plot_ly(
     x = ~sample,
@@ -112,7 +111,7 @@ j <- merged %>%
   )
 j
 
-# scatter plot of coverage per interval
+# scatter plot of coverage of annotated transcript
 s <- merged %>%
   plot_ly(
     x = ~gencodeLengths.tx_len,
