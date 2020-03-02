@@ -1,4 +1,6 @@
-# To run: Rscript extract-bam-info-as-csv.R path/to/file.bam
+# Script is from Soneson et al. 2019 (https://github.com/csoneson/NativeRNAseqComplexTranscriptome/blob/master/Rscripts/get_nbr_reads.R)
+# Function: readBam
+# To run: Rscript extractDataFromBam.R path/to/file.bam
 
 main <- function() {
   
