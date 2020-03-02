@@ -1,1 +1,4 @@
-guppy_basecaller -r -l 2018_dirRNA -s 2019_recall_Guppy3.0.3 --kit SQK-RNA001 --flowcell FLO-MIN106 --num_callers 1 --device "cuda:0 cuda:1" --calib_detect --qscore_filtering
+# Guppy Basecalling Software from Oxford Nanopore Technologies
+# v3.4.5
+
+guppy_basecaller -r -l dirRNA_fast5 -s guppy_basecalled --kit SQK-RNA001 --flowcell FLO-MIN106 --num_callers 1 --device "cuda:0 cuda:1" --calib_detect --qscore_filtering
