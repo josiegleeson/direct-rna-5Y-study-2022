@@ -1,5 +1,6 @@
+# Nanoplot (v1.28.4) and Nanostat (v1.2.0)
 # program used for plotting and data summary of fastq files
 
-Nanoplot --fastq Diff2_pass.fastq --plots hex dot
+Nanoplot --fastq sample_pass.fastq --plots hex dot
 
-NanoStat --fastq Diff2_pass.fastq --outdir Diff2_stats
+NanoStat --fastq samplex_pass.fastq --outdir sample_stats
