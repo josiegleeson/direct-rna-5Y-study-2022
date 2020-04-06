@@ -7,51 +7,59 @@ library(gplots)
 library(pheatmap)
 library(pcaExplorer)
 library(ggplot2)
+setwd("~/Documents/differential_expression/5Y_genes/")
 
-#Import data
-countdata <- read.table("counts.txt", header=TRUE, row.names=1)
-
+# Import data 
+countdata <- read.table("combined_fc_TR_averaged.txt", header=TRUE, row.names=1, sep="\t")
 #remove extra columns of data from featureCounts
-countdata <- countdata[ ,6:ncol(countdata)]
-
+#countdata <- countdata[ ,6:ncol(countdata)]
 colnames(countdata) <- c("diff2", "diff3", "diff4", "undiff3", "undiff4")
 countdata <- as.matrix(countdata)
+head(countdata)
 
 # Assign conditions
 (condition <- factor(c(rep("Differentiated", 3), rep("Undifferentiated", 2))))
 
-# Create coldata frame and make DESeq Dataset
-coldata <- data.frame(row.names=colnames(countdata), condition)
-
+# Make DESeq dataset
+(coldata <- data.frame(row.names=colnames(countdata), condition))
 dds <- DESeqDataSetFromMatrix(countData=countdata, colData=coldata, design=~condition)
+dds
 
-# Optional filtering step to remove very low counts (less than 5 shown here)
+# Optional filtering step to remove very low counts (chosen minimum of 5)
 keep <- rowSums(counts(dds)) >= 5
 dds <- dds[keep,]
 
-# Run DESeq2 pipeline and get results
+# Run DESeq2 pipeline
 dds <- DESeq(dds)
-res <- results(dds)
+res <- DESeq2::results(dds)
+res
 
-# Save normalised counts separately if desired
-norm_counts <- as.data.frame(counts(dds, normalized=TRUE))
-write.csv(norm_counts, file="norm_counts.txt")
+# Save normalised counts separately 
+#norm_counts <- as.data.frame(counts(dds, normalized=TRUE))
+#write.csv(norm_counts, file="norm_counts.txt")
 
-## Order by adjusted p-value
 table(res$padj<0.05)
+# Order by adjusted p-value
 res <- res[order(res$padj), ]
-
-## Merge with normalized count data
+# Merge with normalized count data
 resdata <- merge(as.data.frame(res), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
 names(resdata)[1] <- "Gene"
+head(resdata)
+# Write DE results 
+write.csv(resdata, file="diffexpr-results-5y-gene-min5.csv")
 
-# Write results
-write.csv(resdata, file="diffexpr-results.csv")
+# Plot dispersions
+plotDispEsts(dds, main="Dispersion plot", genecol = "black", fitcol = "cyan", finalcol = "blue", legend = TRUE)
 
-# Regularised log transformation for visualisation
+# RLD for viewing
 rld <- rlogTransformation(dds)
+head(assay(rld))
+hist(assay(rld))
 
-# Colours
+# Plot residual p-values
+hist(res$pvalue, breaks=50, col="grey")
+
+#Set colours for plotting
 mycols <- brewer.pal(8, "Accent")[1:length(unique(condition))]
 
 # Heatmap
@@ -65,27 +73,27 @@ dev.off()
 
 # PCA
 rld_pca <- function (rld, intgroup = "condition", ntop = 500, colors=NULL, legendpos="bottomright", main="Principal Component Analysis", textcx=1, ...) {
-      require(genefilter)
-      require(calibrate)
-      require(RColorBrewer)
-      rv = rowVars(assay(rld))
-      select = order(rv, decreasing = TRUE)[seq_len(min(ntop, length(rv)))]
-      pca = prcomp(t(assay(rld)[select, ]))
-      fac = factor(apply(as.data.frame(colData(rld)[, intgroup, drop = FALSE]), 1, paste, collapse = " : "))
-    if (is.null(colors)) {
-      if (nlevels(fac) >= 3) {
-        colors = brewer.pal(nlevels(fac), "Paired")
-      }   else {
-        colors = c("black", "red")
-      }
+  require(genefilter)
+  require(calibrate)
+  require(RColorBrewer)
+  rv = rowVars(assay(rld))
+  select = order(rv, decreasing = TRUE)[seq_len(min(ntop, length(rv)))]
+  pca = prcomp(t(assay(rld)[select, ]))
+  fac = factor(apply(as.data.frame(colData(rld)[, intgroup, drop = FALSE]), 1, paste, collapse = " : "))
+  if (is.null(colors)) {
+    if (nlevels(fac) >= 3) {
+      colors = brewer.pal(nlevels(fac), "Paired")
+    }   else {
+      colors = c("black", "red")
     }
-    pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
-    pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
-    pc1lab <- paste0("PC1: ",as.character(pc1var),"% variance")
-    pc2lab <- paste0("PC2: ",as.character(pc2var),"% variance")
-    plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, xlab=pc1lab, ylab=pc2lab, main=main, ...)
-    with(as.data.frame(pca$x), textxy(PC1, PC2, labs=rownames(as.data.frame(pca$x)), cex=textcx))
-    legend(legendpos, legend=levels(fac), col=colors, pch=20)
+  }
+  pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
+  pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
+  pc1lab <- paste0("PC1: ",as.character(pc1var),"% variance")
+  pc2lab <- paste0("PC2: ",as.character(pc2var),"% variance")
+  plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, xlab=pc1lab, ylab=pc2lab, main=main, ...)
+  with(as.data.frame(pca$x), textxy(PC1, PC2, labs=rownames(as.data.frame(pca$x)), cex=textcx))
+  legend(legendpos, legend=levels(fac), col=colors, pch=20)
 }
 png("pca-1-2.png", 1000, 1000, pointsize=30)
 rld_pca(rld, colors=mycols, intgroup="condition", xlim=c(-10, 15), ylim=c(-10, 10))
@@ -100,22 +108,18 @@ maplot <- function (res, thresh=0.05, labelsig=FALSE, textcx=1, ...) {
     with(subset(res, padj<thresh), textxy(baseMean, log2FoldChange, labs=Gene, cex=textcx, col=2))
   }
 }
-png("diffexpr-maplot.png", 1500, 1000, pointsize=20)
+png("diffexpr-maplot-0.05.png", 1500, 1000, pointsize=20)
 maplot(resdata, main="MA Plot")
 dev.off()
 
 # Volcano Plot
-volcanoplot <- function (res, lfcthresh=2, sigthresh=0.05, main="Volcano Plot", legendpos="bottomright", labelsig=FALSE, textcx=1, ...) {
-  with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main=main, ...))
-  with(subset(res, padj<sigthresh ), points(log2FoldChange, -log10(pvalue), pch=20, col="red", ...))
+volcanoplot <- function (res, lfcthresh=2, sigthresh=0.05, xlab="log2(Fold Change)", legendpos="topright", labelsig=FALSE, textcx=1.5, ...) {
+  with(res, plot(log2FoldChange, -log10(pvalue), pch=20, xlab=xlab, cex.axis=1.8, cex.lab=1.5, ...))
+  with(subset(res, padj<sigthresh ), points(log2FoldChange, -log10(pvalue), pch=20, col="blue", ...))
   with(subset(res, abs(log2FoldChange)>lfcthresh), points(log2FoldChange, -log10(pvalue), pch=20, col="orange", ...))
   with(subset(res, padj<sigthresh & abs(log2FoldChange)>lfcthresh), points(log2FoldChange, -log10(pvalue), pch=20, col="green", ...))
-  if (labelsig) {
-    require(calibrate)
-    with(subset(res, padj<sigthresh & abs(log2FoldChange)>lfcthresh), textxy(log2FoldChange, -log10(pvalue), labs=Gene, cex=textcx, ...))
-  }
-  legend(legendpos, xjust=1, yjust=1, legend=c(paste("p-adj<",sigthresh,sep=""), paste("|LogFC|>",lfcthresh,sep=""), "both"), pch=20, col=c("red","orange","green"))
+  legend(legendpos, xjust=1, yjust=1, legend=c(paste("p-adj<",sigthresh,sep=""), paste("|log2(FC)|>",lfcthresh,sep=""), "both"), cex=1.5, pch=20, col=c("blue","orange","green"))
 }
-png("diffexpr-volcanoplot-nolabel.png", 1200, 1000, pointsize=20)
-volcanoplot(resdata, lfcthresh=2, sigthresh=0.05, textcx=0.8, xlim=c(-10, 10), legendpos="topright")
+pdf("diffexpr-volcanoplot-hi-res.pdf", 18, 15, pointsize=20)
+volcanoplot(resdata, lfcthresh=2, sigthresh=0.05, xlim=c(-6, 6), ylim=c(0,33), legendpos="topright")
 dev.off()
