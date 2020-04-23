@@ -1,8 +1,0 @@
-# Transcripts were quantified using Salmon (v0.8.1) in alignment based mode
-# Samples were quantified individually for both 5Y and sequin data
-
-# Human transcripts
-salmon quant -t GRCh38.cDNA.ncRNA.all.fasta -l A -a diff2/diff2.bam -o diff2_5y
-
-#Sequin transcripts
-salmon quant -t rna_sequins.fasta -l A -a diff2/diff2.bam -o diff2_sequins
