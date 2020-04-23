@@ -1,31 +1,47 @@
 # FLAIR (v1.4.0) was used to correct and collapse transcripts
 # Using bed12 files of primary alignments only
+# bed12 created from BAMs using FLAIR script
 
 # Correct mapped reads:
 # 5Y
 python flair/flair.py correct \
--c GRCh38_EBV.chrom.sizes.tsv \
+-c GRCh38.chrom.sizes.tsv \
 -f gencode.v31.annotation.gtf \
 -g hg38.fa \
--q bam_files/diffx_primary.bed12 \
--o diffx_primary
+-q 5y_primary.bed12 \
+-o 5y_corrected
 
 # Sequins
 python flair/flair.py correct \
 -c sequin.chrom.sizes.tsv \
 -f rnasequin_annotation_2.2.gtf \
 -g rnasequin_decoychr_2.2.fa \
--q bam_files_sequin_genome/diffx_primary_sequin.bed12 \
--o diffx_sequin_primary
+-q sequin_primary.bed12 \
+-o sequin_corrected
 
-# Combine the corrected psl files for human and sequin:
-cat sample*_corrected.psl > 5Y_corrected.psl 
-cat sample*_sequin_corrected.psl > sequin_corrected.psl
 
 # Collapse with a threshold of at least 5 supporting reads (default is 3)
 # Collapse:
 # 5Y
-python flair/flair.py collapse -s 5 -f gencode.v31.annotation.gtf -r 5Y_pass.fastq -q 5Y_corrected.psl -g hg38.fa -o 5Y_collapsed
+python flair/flair.py collapse \
+-s 5 \
+-f gencode.v31.annotation.gtf \
+-r 5Y_pass.fastq \
+-q 5Y_corrected.psl \
+-g hg38.fa \
+-o 5Y_collapsed
 
 # Sequins
-python flair/flair.py collapse -s 5 -f rnasequin_annotation.gtf -r sequin_pass.fa -q sequin_corrected.psl -g rnasequin_decoychr.fa -o sequin_collapsed
+python flair/flair.py collapse \
+-s 5 \
+-f rnasequin_annotation.gtf \
+-r sequin_pass.fa \
+-q sequin_corrected.psl \
+-g rnasequin_decoychr.fa \
+-o sequin_collapsed
+
+# FLAIR outputs gtf files of collapsed isoforms
+# Compare to annotated with gffcompare
+gffcompare -r genomes/gencode.v31.annotation.gtf -o 5y 5y_collapsed.isoforms.gtf
+gffcompare -r genomes/rnasequin_annotation_2.2.gtf -o sequins sequin_collapsed.isoforms.gtf
+
