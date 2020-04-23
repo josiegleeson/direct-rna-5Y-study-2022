@@ -9,13 +9,12 @@ library(pcaExplorer)
 library(ggplot2)
 setwd("~/Documents/differential_expression/5Y_genes/")
 
-# Import data 
-countdata <- read.table("combined_fc_TR_averaged.txt", header=TRUE, row.names=1, sep="\t")
-#remove extra columns of data from featureCounts
+# Import data (either gene counts from featureCounts or transcript counts from Salmon)
+countdata <- read.table("5y_techrep_averaged.txt", header=TRUE, row.names=1, sep="\t")
+#remove extra columns of data from featureCounts if needed
 #countdata <- countdata[ ,6:ncol(countdata)]
 colnames(countdata) <- c("diff2", "diff3", "diff4", "undiff3", "undiff4")
 countdata <- as.matrix(countdata)
-head(countdata)
 
 # Assign conditions
 (condition <- factor(c(rep("Differentiated", 3), rep("Undifferentiated", 2))))
@@ -34,10 +33,11 @@ dds <- DESeq(dds)
 res <- DESeq2::results(dds)
 res
 
-# Save normalised counts separately 
+# Save normalised counts separately, used to average technical replicates
 #norm_counts <- as.data.frame(counts(dds, normalized=TRUE))
 #write.csv(norm_counts, file="norm_counts.txt")
 
+#DESeq2 results
 table(res$padj<0.05)
 # Order by adjusted p-value
 res <- res[order(res$padj), ]
