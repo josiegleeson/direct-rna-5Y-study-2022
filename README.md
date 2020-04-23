@@ -1,4 +1,10 @@
-# Evaluation of direct RNA sequencing with Oxford Nanopore Technology for gene expression profiling
+# direct RNA sequencing with ONT for gene expression profiling
 
 
-This repository contains scripts executed to produce data presented in the thesis submitted to the University of Melbourne (October 2019).
+This repository contains scripts to produce results and figures presented in the paper.
+
+Please cite:
+Paper.
+
+Data access:
+
