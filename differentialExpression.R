@@ -1,5 +1,5 @@
-# Performing differential expression analysis with DESeq2 (v1.26.0)
-# Ran separately on 5Y and sequin gene counts (from featureCounts)
+# Performing differential expression analysis with DESeq2 workflow (v1.26.0)
+# Ran separately on 5Y and sequin counts
 
 library(DESeq2)
 library(RColorBrewer)
