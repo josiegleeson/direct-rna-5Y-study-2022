@@ -1,6 +1,6 @@
-# Script is from Soneson et al. 2019 (https://github.com/csoneson/NativeRNAseqComplexTranscriptome/blob/master/Rscripts/get_nbr_reads.R)
-# Function: readBam
-# To run: Rscript extractDataFromBam.R path/to/file.bam
+# Script is by Soneson et al. 2019 (https://github.com/csoneson/NativeRNAseqComplexTranscriptome/blob/master/Rscripts/get_nbr_reads.R)
+# Function used here: readBam
+# To run in bash: Rscript extractDataFromBam.R path/to/file.bam
 
 main <- function() {
   
@@ -55,7 +55,7 @@ main <- function() {
                                                              is.na(nbrSupplementaryAlignments), 0))
   
 
-  write.csv(tmp, file = "output.csv")
+  write.csv(tmp, file = ".csv")
 }
 
 main()
