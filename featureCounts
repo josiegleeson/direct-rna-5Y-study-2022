@@ -1,9 +1,0 @@
-# Quantify genomic alignments
-# featureCounts from Subread package v1.6.4 
-
-# count human genes
-featureCounts -L -a gencode.v31.annotation.gtf -o featcounts_5Y diff2.sam diff3tr1.sam diff3tr2.sam diff4.sam undiff3.sam undiff4.sam
-
-# count sequin genes
-featureCounts -L -a rnasequin_annotation_2.2.gtf -o featcounts_sequins diff2_sequins.sam diff3tr1_sequins.sam diff3tr2_sequins.sam diff4.sam undiff3_sequins.sam undiff4_sequins.sam
-
