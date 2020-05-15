@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # direct RNA/cDNA pipeline with sequins
 
+# Wrap script in PBS/slurm with:
+#for f in diff1 diff2tr1 diff2tr2 diff3 undiff1 undiff2
+#do
+#echo "Procseeing $f"
+#./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf $f/pass.fastq $f"_output"
+#done
+
 # Requires: python3, minimap2, samtools, bedtools, featureCounts, salmon
 HGENOME=$1
 HTRANSCRIPTOME=$2
@@ -67,7 +74,6 @@ echo "Finished for sample"
 
 }
 
-
 function runSequins() {
 mkdir "$OUTPREF-sequins"
 mkdir "$OUTPREF-sequins/alignments"
@@ -122,12 +128,16 @@ echo "Finished for sequins"
 
 }
 
-# sanity check
+# check
 if [ $# == 8 ]
 then
     runSample
     runSequins
 elif [ $1 == "-h" ]
+then
+    echo "Usage: ./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf all.fastq sample_name"
+    echo "python3, minimap2, samtools, bedtools, featureCounts and salmon must be in your PATH"
+elif [ $# != 8 ]
 then
     echo "Usage: ./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf all.fastq sample_name"
     echo "python3, minimap2, samtools, bedtools, featureCounts and salmon must be in your PATH"
