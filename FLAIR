@@ -25,8 +25,9 @@ python flair/flair.py correct \
 # 5Y
 python flair/flair.py collapse \
 -s 5 \
+-n \
 -f gencode.v31.annotation.gtf \
--r 5Y_pass.fastq \
+-r 5Y_pass.fa \
 -q 5Y_corrected.psl \
 -g hg38.fa \
 -o 5Y_collapsed
@@ -34,6 +35,7 @@ python flair/flair.py collapse \
 # Sequins
 python flair/flair.py collapse \
 -s 5 \
+-n \
 -f rnasequin_annotation.gtf \
 -r sequin_pass.fa \
 -q sequin_corrected.psl \
