@@ -3,7 +3,7 @@
 # Included extra filters to select the 'true' transcript origin of each read based on alignemnt score, aligned fraction, accuracy
 # coverage fraction of transcipt.
 
-# Usage: Rscript extract_data_bam.R yourfile.bam gencode.gtf ouputprefix
+# Usage: Rscript extractDataFromBam.R yourfile.bam gencode.gtf ouputprefix
 
 # GenomicAlignments/Features package is from bioconductor, need to install bioconductor then run:
 # BiocManager::install("GenomicFeatures")
