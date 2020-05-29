@@ -3,10 +3,9 @@
 
 This repository contains scripts to produce results and figures presented in the paper.
 
-Please cite:
-Paper.
+Please cite: x
 
-Data access:
+Data access: x
 
 <b>Instructions and descriptions of each script:</b></br>
 <b>dRNA.sh</b></br>
@@ -17,7 +16,7 @@ Takes FASTQ file from a sample that includes 5Y and sequin sequence. Maps to bot
 
 <b>wrapper-dRNA.pbs</b></br>
 Usage:</br>
-x</br>
+qsub wrapper-dRNA.pbs</br>
 Description:</br>
 The pbs job script used to run dRNA.sh on all samples.
 
