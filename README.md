@@ -10,7 +10,7 @@ Data access:
 
 Instructions and descriptions of each script:
 
-dRNA.sh
+<b>dRNA.sh</b></br>
 Usage:
 ./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf pass.fastq sample_name
 Description: 
