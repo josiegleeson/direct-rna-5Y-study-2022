@@ -43,7 +43,7 @@ bedtools bamtobed -bed12 -i $OUTPREF/alignments/primary-genomic-aln.bam > $OUTPR
 echo "Performing transcriptome alignment on $FASTQ" 
 # Transcriptome
 # Mapping with minimap2
-minimap2 -ax map-ont $HTRANSCRIPTOME $FASTQ > $OUTPREF/alignments/transcriptomic-aln.sam
+minimap2 -ax map-ont -p 0.99 -N 10 --end-bonus 1 $HTRANSCRIPTOME $FASTQ > $OUTPREF/alignments/transcriptomic-aln.sam
 # Convert sam to bam
 samtools view -bS $OUTPREF/alignments/transcriptomic-aln.sam > $OUTPREF/alignments/transcriptomic-aln.bam
 # Sort bam
@@ -66,9 +66,9 @@ featureCounts -L -a $HANNOTATION -o $OUTPREF/quantifications/genomic-quant $OUTP
 echo "Performing transcript quantification"
 # Quantifying transcripts with salmon
     # Primary for transcript stats such as % full-length etc
-salmon quant -t $HTRANSCRIPTOME -l A -q --gencode -a $OUTPREF/alignments/primary-transcriptomic-aln.bam $OUTPREF/alignments/transcriptomic-aln.bam -o $OUTPREF/quantifications/primary-transcriptomic-quant
+salmon quant -t $HTRANSCRIPTOME -l A -q --gencode --noErrorModel -a $OUTPREF/alignments/primary-transcriptomic-aln.bam $OUTPREF/alignments/transcriptomic-aln.bam -o $OUTPREF/quantifications/primary-transcriptomic-quant
     # All alignments for differential expression analysis
-salmon quant -t $HTRANSCRIPTOME -l A -q --gencode -a $OUTPREF/alignments/transcriptomic-aln.bam -o $OUTPREF/quantifications/transcriptomic-quant
+salmon quant -t $HTRANSCRIPTOME -l A -q --gencode --noErrorModel -a $OUTPREF/alignments/transcriptomic-aln.bam -o $OUTPREF/quantifications/transcriptomic-quant
 
 echo "Finished for sample"
 
@@ -96,17 +96,15 @@ bedtools bamtobed -bed12 -i $OUTPREF-sequins/alignments/primary-genomic-aln.bam 
 echo "Performing transcriptome alignment on $FASTQ" 
 # Transcriptome
 # Mapping with minimap2
-minimap2 -ax map-ont $STRANSCRIPTOME $FASTQ > $OUTPREF-sequins/alignments/transcriptomic-aln.sam
+minimap2 -ax map-ont -p 0.99 -N 10 --end-bonus 1 $STRANSCRIPTOME $FASTQ > $OUTPREF-sequins/alignments/transcriptomic-aln.sam
 # Convert sam to bam
 samtools view -bS $OUTPREF-sequins/alignments/transcriptomic-aln.sam > $OUTPREF-sequins/alignments/transcriptomic-aln.bam
+# Primary and secondary only
+samtools view -h -F 2052 $OUTPREF-sequins/alignments/transcriptomic-aln.bam > $OUTPREF-sequins/alignments/ps-aln.bam
 # Sort bam
-samtools sort -o $OUTPREF-sequins/alignments/sorted-transcriptomic-aln.bam $OUTPREF-sequins/alignments/transcriptomic-aln.bam
+samtools sort -o $OUTPREF-sequins/alignments/sorted-ps-aln.bam $OUTPREF-sequins/alignments/ps-aln.bam
 # Index the sorted bam
-samtools index $OUTPREF-sequins/alignments/sorted-transcriptomic-aln.bam
-# Create bam with primary alignment only
-samtools view -b -h -F 2308 $OUTPREF-sequins/alignments/sorted-transcriptomic-aln.bam > $OUTPREF-sequins/alignments/primary-transcriptomic-aln.bam
-# Conver to bed12
-bedtools bamtobed -bed12 -i $OUTPREF-sequins/alignments/primary-transcriptomic-aln.bam > $OUTPREF-sequins/alignments/primary-transcriptomic-aln.bed12
+samtools index $OUTPREF-sequins/alignments/sorted-ps-aln.bam
 
 mkdir "$OUTPREF-sequins/quantifications"
 
