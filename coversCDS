@@ -1,8 +1,12 @@
 # bash commands to find reads that cover the entire CDS
 
-bedtools bamtobed -bed12 -i 5Y_genome_primary.bam > 5Y_primary.bed12
+bedtools bamtobed -bed12 -i 5Y_genome_primary.bam > 5Y_genome_primary.bed12
 
 awk '$3 == "CDS"' gencode.v31.annotation.gtf > gencode.v31.annotation.CDS.gtf
 
-bedtools intersect -s -F 1.0 -u -a 5Y_primary.bed12 -b gencode.v31.annotation.CDS.gtf > 5Y_full_length.bed12
+bedtools intersect -s -F 1.0 -u -a 5Y_genome_primary.bed12 -b gencode.v31.annotation.CDS.gtf > 5Y_coversCDS.bed12
+
+awk '{ print $4 }' 5Y_coversCDS.bed12 > reads_coversCDS.txt
+
+
 
