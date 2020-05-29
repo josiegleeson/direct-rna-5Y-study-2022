@@ -1,5 +1,5 @@
 # FLAIR (v1.4.0) was used to correct and collapse transcripts
-# Using bed12 files of primary alignments only
+# Using bed12 files of primary genomic alignments only
 # bed12 created from BAMs using FLAIR script
 
 # Correct mapped reads:
