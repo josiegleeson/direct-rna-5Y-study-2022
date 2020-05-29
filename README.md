@@ -8,15 +8,14 @@ Paper.
 
 Data access:
 
-Instructions and descriptions of each script:
-
+<b>Instructions and descriptions of each script:</b></br>
 <b>dRNA.sh</b></br>
 Usage:</br>
 ./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf pass.fastq sample_name</br>
 Description:</br> 
 Takes FASTQ file from a sample that includes 5Y and sequin sequence. Maps to both human and sequin genome and transcriptome. Performs gene and transcript quantification. 
 
-<b>wrapper-dRNA.pbs<b></br>
+<b>wrapper-dRNA.pbs</b></br>
 Usage:</br>
 x</br>
 Description:</br>
