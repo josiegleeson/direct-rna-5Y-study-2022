@@ -4,7 +4,7 @@
 #PBS -l mem=32GB
 #PBS -l ncpus=12
 
-# Takes roughly 2 hours per sample
+# Takes roughly 30 mins per 500k reads
 
 for f in diff2 diff3tr1 diff3tr2 diff4 undiff3 undiff4
 do
