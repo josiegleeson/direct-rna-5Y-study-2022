@@ -1,4 +1,5 @@
 # Performing differential expression analysis with DESeq2 workflow (v1.26.0)
+# Plots made using scripts from: https://gist.github.com/stephenturner/f60c1934405c127f09a6
 # Ran separately on 5Y and sequin counts
 
 library(DESeq2)
