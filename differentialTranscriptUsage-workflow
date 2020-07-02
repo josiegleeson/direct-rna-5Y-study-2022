@@ -1,1 +1,145 @@
 # Add in DTU analysis
+
+library(IsoformSwitchAnalyzeR)
+
+counts <- read.csv("nanocount_counts.csv", header=T)
+
+myDesign <- data.frame(
+  sampleID = c("diff1", "diff2", "diff3", "undiff1", "undiff2"),
+  condition = c("Cond1", "Cond1", "Cond1", "Cond2","Cond2")
+)
+
+aSwitchList <- importRdata(
+  isoformCountMatrix   = counts,
+  isoformRepExpression = counts,
+  designMatrix         = myDesign,
+  isoformExonAnnoation = "gencode.v31.annotation.gtf",
+  isoformNtFasta       = "gencode.v31.transcripts.fa",
+  showProgress = FALSE
+)
+                                
+SwitchListFiltered <- preFilter(
+  switchAnalyzeRlist = aSwitchList,
+  geneExpressionCutoff = 5,
+  isoformExpressionCutoff = 5,
+  removeSingleIsoformGenes = TRUE)
+
+SwitchListAnalyzed <- isoformSwitchTestDEXSeq(
+  switchAnalyzeRlist = SwitchListFiltered,
+  reduceToSwitchingGenes=TRUE,
+  reduceFurtherToGenesWithConsequencePotential = FALSE,
+  alpha = 0.05,
+  dIFcutoff = 0.1,
+  onlySigIsoforms = FALSE
+)
+
+extractSwitchSummary(SwitchListAnalyzed)
+write.csv(SwitchListAnalyzed$isoformFeatures, "isoformfeatures5.5.tr.csv")
+
+SwitchListAnalyzed <- analyzeORF(
+  SwitchListAnalyzed,
+  orfMethod = "longest",
+  showProgress=FALSE
+)
+
+SwitchListAnalyzed <- extractSequence(
+  SwitchListAnalyzed, 
+  pathToOutput = 'counts/',
+  writeToFile=TRUE
+)
+
+# Needs external input
+SwitchListAnalyzed <- analyzeCPAT(
+  switchAnalyzeRlist   = SwitchListAnalyzed,
+  pathToCPATresultFile = "counts/cpat.txt",
+  codingCutoff         = 0.725, # the coding potential cutoff we suggested for human
+  removeNoncodinORFs   = TRUE   # because ORF was predicted de novo
+)
+
+SwitchListAnalyzed <- analyzePFAM(
+  switchAnalyzeRlist   = SwitchListAnalyzed,
+  pathToPFAMresultFile = "counts/pfam.txt",
+  showProgress=FALSE
+)
+
+SwitchListAnalyzed <- analyzeAlternativeSplicing(
+  switchAnalyzeRlist = SwitchListAnalyzed,
+  quiet=TRUE
+)
+
+consequencesOfInterest <- c(
+  'intron_retention',
+  'coding_potential',
+  'ORF_seq_similarity',
+  'NMD_status',
+  'domains_identified'
+)
+
+SwitchListAnalyzed <- analyzeSwitchConsequences(
+  SwitchListAnalyzed,
+  consequencesToAnalyze = consequencesOfInterest,
+  showProgress=FALSE
+)
+
+extractSwitchSummary(SwitchListAnalyzed, filterForConsequences = FALSE)
+
+SwitchListAnalyzedSubset <- subsetSwitchAnalyzeRlist(
+  SwitchListAnalyzed, 
+  SwitchListAnalyzed$isoformFeatures$condition_1 == 'Cond1'
+)
+
+extractTopSwitches(
+  SwitchListAnalyzed, 
+  extractGenes = TRUE,
+  filterForConsequences = FALSE, 
+  n = Inf, 
+  sortByQvals = TRUE
+)
+
+switchPlotTopSwitches(
+  switchAnalyzeRlist = SwitchListAnalyzed, 
+  n = Inf,                                          
+  filterForConsequences = FALSE,
+  fileType = "pdf",                                 
+  pathToOutput = "counts/dtu-plots"
+)
+
+# Splicing
+extractSplicingSummary( SwitchListAnalyzed, 
+                        asFractionTotal = FALSE, 
+                        plotGenes =FALSE,
+                        alpha = 0.05,
+                        dIFcutoff = 0.1)
+
+splicingEnrichment <- extractSplicingEnrichment(
+  SwitchListAnalyzed,
+  splicingToAnalyze='all',
+  returnResult=TRUE,
+  returnSummary=TRUE
+)
+extractSplicingEnrichmentComparison( SwitchListAnalyzed )
+
+pdf("counts/dtu-plots/splicing-genome-wide.pdf", 15,10)
+extractSplicingGenomeWide( SwitchListAnalyzed )
+dev.off()
+
+bioMechanismeAnalysis <- analyzeSwitchConsequences(
+  SwitchListAnalyzed, 
+  consequencesToAnalyze = c('tss','tts','intron_structure'),
+  showProgress = FALSE
+)$switchConsequence
+
+bioMechanismeAnalysis <- bioMechanismeAnalysis[which(bioMechanismeAnalysis$isoformsDifferent),]
+
+myConsequences <- SwitchListAnalyzed$switchConsequence
+myConsequences <- myConsequences[which(myConsequences$isoformsDifferent),]
+myConsequences$isoPair <- paste(myConsequences$isoformUpregulated, myConsequences$isoformDownregulated)
+
+write.csv(myConsequences, "myconsequences.csv")
+
+bioMechanismeAnalysis$isoPair <- paste(bioMechanismeAnalysis$isoformUpregulated, bioMechanismeAnalysis$isoformDownregulated)
+bioMechanismeAnalysis <- bioMechanismeAnalysis[which(bioMechanismeAnalysis$isoPair %in% myConsequences$isoPair),]  
+
+write.csv(bioMechanismeAnalysis, "biomechanalysis.csv")
+
+
