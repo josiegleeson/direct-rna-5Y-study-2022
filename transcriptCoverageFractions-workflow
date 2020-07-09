@@ -15,7 +15,6 @@ all_5y <- read.csv(file = "all_5y.csv", header = TRUE, na.strings="#N/A")
 
 # Merge files by transcript name for each length
 merged <- merge(all_5y, lengths, by.x = "transcriptName", by.y = "gencodeLengths.tx_name", all.x = TRUE)
-merged <- na.omit(merged)
 
 # coverage = width / known length
 merged <- merged %>% 
@@ -25,48 +24,38 @@ merged <- merged %>%
 merged <- merged %>% 
   mutate(proportionAligned=alignedLength/readLength)
 
-# find the median coverage fraction for each unique transcript
-medianmerged <- mergedex %>% 
-  group_by(transcript) %>% 
-  summarise_at(vars(coverages, gencodeLengths.tx_len, Counts), funs(median(., na.rm=TRUE)))
+# merge again with counts per transcript
+express <- read_csv(file = "nanocount-5y.csv")
+expression <- merge(merged, express, by.x = "transcript", by.y = "tr", all.x = TRUE)
 
-# merge again with average salmon counts per transcript
-expression <- read_csv(file = "5ysalmon.csv")
-expressionmerged <- merge(merged, expression, by.x = "transcript", by.y = "Name", all.x = TRUE)
-expressionmerged <- expressionmerged[ !is.na(expressionmerged$Counts), ] 
+expression$total <- cut(expression$total, breaks=c(0,1,10,100,100000), right=FALSE, dig.lab = 5)
+expression$total <- as.factor(expression$total)
 
-# set intervals and factor
-merged$gencodeLengths.tx_len <- cut(merged$gencodeLengths.tx_len, breaks=c(0,500,1000,1500,2000,200000), right=FALSE, dig.lab = 5)
-merged$gencodeLengths.tx_len <- as.factor(merged$gencodeLengths.tx_len)
-
-# violin plot
-
+expression$gencodeLengths.tx_len <- cut(expression$gencodeLengths.tx_len, breaks=c(0,500,1000,1500,2000,2500,3000,5000,230000), right=FALSE, dig.lab = 5)
+expression$gencodeLengths.tx_len <- as.factor(expression$gencodeLengths.tx_len)
 
 # boxplots with expression
+p <- ggplot(data=expression, aes(x=gencodeLengths.tx_len, y=coverages, color=total)) +
+  geom_boxplot(outlier.shape=NA) +
+  ylab("Coverage Fraction") +
+  xlab("Transcript Length") +
+  theme_classic(base_size=16)
+p
 
-
-# function for density scatterplot 
-get_density <- function(x, y, ...) {
-  dens <- MASS::kde2d(x, y, ...)
-  ix <- findInterval(x, dens$x)
-  iy <- findInterval(y, dens$y)
-  ii <- cbind(ix, iy)
-  return(dens$z[ii])
-}
-
-# create df of lengths and coverage fractions
-dat <- data.frame(
-  x = merged$gencodeLengths.tx_len,
-  y = merged$coverage
-)
-
-# call function on df
-dat$density <- get_density(dat$x, dat$y, n = 300)
-
-# plot and save
-pdf("5y-density-all-reads.tiff", width = 8, height = 6)
-ggplot(dat) + 
-  geom_point(aes(x, y, color = density), alpha=0.2) +
-  xlim(0,10000) +
-  scale_color_viridis()
+# 2D Density
+pdf("5y-density-plot.pdf", width=8, height=5)
+ggplot() + 
+  stat_density_2d(data=merged, aes(x=gencodeLengths.tx_len, y=coverages, fill = ..level..), geom = "polygon",
+                  position = "identity",
+                  na.rm = TRUE,
+                  show.legend = TRUE,
+                  inherit.aes = TRUE,
+                  bins = 25
+  ) +
+  stat_smooth(data=merged, aes(x=gencodeLengths.tx_len, y=coverages), color="lavender", se=TRUE, size=1, level=0.95) +
+  #geom_point(data=mediansequins, aes(x=LENGTH, y=coverages), color="orange", size=1, alpha=0.7) +
+  xlim(0,8000) +
+  ylim(0,1) +
+  scale_fill_viridis_c() +
+  theme_classic(base_size=16)
 dev.off()
