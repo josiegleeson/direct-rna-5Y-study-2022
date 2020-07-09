@@ -5,8 +5,8 @@ library(IsoformSwitchAnalyzeR)
 counts <- read.csv("nanocount_counts.csv", header=T)
 
 myDesign <- data.frame(
-  sampleID = c("diff1", "diff2", "diff3", "undiff1", "undiff2"),
-  condition = c("Cond1", "Cond1", "Cond1", "Cond2","Cond2")
+  sampleID = c("undiff1", "undiff2", "diff1", "diff2", "diff3"),
+  condition = c("Cond1", "Cond1", "Cond2", "Cond2","Cond2")
 )
 
 aSwitchList <- importRdata(
