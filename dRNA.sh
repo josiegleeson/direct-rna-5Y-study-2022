@@ -43,15 +43,15 @@ bedtools bamtobed -bed12 -i $OUTPREF/alignments/primary-genomic-aln.bam > $OUTPR
 echo "Performing transcriptome alignment on $FASTQ" 
 # Transcriptome
 # Mapping with minimap2
-minimap2 -ax map-ont -p 0.99 -N 10 --end-bonus 1 $HTRANSCRIPTOME $FASTQ > $OUTPREF/alignments/transcriptomic-aln.sam
+minimap2 -ax map-ont -N 100 $HTRANSCRIPTOME $FASTQ > $OUTPREF/alignments/transcriptomic-aln.sam
 # Convert sam to bam
 samtools view -bS $OUTPREF/alignments/transcriptomic-aln.sam > $OUTPREF/alignments/transcriptomic-aln.bam
 # Sort bam
 samtools sort -o $OUTPREF/alignments/sorted-transcriptomic-aln.bam $OUTPREF/alignments/transcriptomic-aln.bam
 # Index the sorted bam
 samtools index $OUTPREF/alignments/sorted-transcriptomic-aln.bam
-# Create bam with primary alignment only
-samtools view -b -h -F 2308 $OUTPREF/alignments/sorted-transcriptomic-aln.bam > $OUTPREF/alignments/primary-transcriptomic-aln.bam
+# Create bam with primary alignment and secondary only
+samtools view -h -F 2052 $OUTPREF/alignments/sorted-transcriptomic-aln.bam > $OUTPREF/alignments/primary-transcriptomic-aln.bam
 # Conver to bed12
 bedtools bamtobed -bed12 -i $OUTPREF/alignments/primary-transcriptomic-aln.bam > $OUTPREF/alignments/primary-transcriptomic-aln.bed12
 
@@ -64,11 +64,8 @@ featureCounts -L -a $HANNOTATION -o $OUTPREF/quantifications/primary-genomic-qua
 featureCounts -L -a $HANNOTATION -o $OUTPREF/quantifications/genomic-quant $OUTPREF/alignments/genomic-aln.bam
 
 echo "Performing transcript quantification"
-# Quantifying transcripts with salmon
-    # Primary for transcript stats such as % full-length etc
-salmon quant -t $HTRANSCRIPTOME -l A -q --gencode --noErrorModel -a $OUTPREF/alignments/primary-transcriptomic-aln.bam $OUTPREF/alignments/transcriptomic-aln.bam -o $OUTPREF/quantifications/primary-transcriptomic-quant
-    # All alignments for differential expression analysis
-salmon quant -t $HTRANSCRIPTOME -l A -q --gencode --noErrorModel -a $OUTPREF/alignments/transcriptomic-aln.bam -o $OUTPREF/quantifications/transcriptomic-quant
+# Quantifying transcripts with NanoCount
+NanoCount -i $OUTPREF/alignments/transcriptomic-aln.bam $OUTPREF/alignments/transcriptomic-aln.bam -p align_score -3 100 --extra_tx_info --discard_suplementary -o $OUTPREF/quantifications/transcriptomic-quant.tsv
 
 echo "Finished for sample"
 
@@ -96,7 +93,7 @@ bedtools bamtobed -bed12 -i $OUTPREF-sequins/alignments/primary-genomic-aln.bam 
 echo "Performing transcriptome alignment on $FASTQ" 
 # Transcriptome
 # Mapping with minimap2
-minimap2 -ax map-ont -p 0.99 -N 10 --end-bonus 1 $STRANSCRIPTOME $FASTQ > $OUTPREF-sequins/alignments/transcriptomic-aln.sam
+minimap2 -ax map-ont -N 100 $STRANSCRIPTOME $FASTQ > $OUTPREF-sequins/alignments/transcriptomic-aln.sam
 # Convert sam to bam
 samtools view -bS $OUTPREF-sequins/alignments/transcriptomic-aln.sam > $OUTPREF-sequins/alignments/transcriptomic-aln.bam
 # Primary and secondary only
@@ -116,11 +113,8 @@ featureCounts -L -a $SANNOTATION -o $OUTPREF-sequins/quantifications/genomic-qua
 featureCounts -L -a $SANNOTATION -o $OUTPREF-sequins/quantifications/primary-genomic-quant $OUTPREF-sequins/alignments/sorted-genomic-aln.bam --primary
 
 echo "Performing transcript quantification"
-# Quantifying transcripts with salmon
-    # Primary for transcript stats such as % full-length etc
-salmon quant -t $STRANSCRIPTOME -l A -q -a $OUTPREF-sequins/alignments/primary-transcriptomic-aln.bam -o $OUTPREF-sequins/quantifications/primary-transcriptomic-quant
-    # All alignments for differential expression analysis
-salmon quant -t $STRANSCRIPTOME -l A -q -a $OUTPREF-sequins/alignments/transcriptomic-aln.bam -o $OUTPREF-sequins/quantifications/transcriptomic-quant
+# Quantifying transcripts with NanoCount
+NanoCount -i $OUTPREF-sequins/alignments/transcriptomic-aln.bam -p align_score -3 100 --extra_tx_info --discard_suplementary -o $OUTPREF-sequins/quantifications/transcriptomic-quant.tsv
 
 echo "Finished for sequins"
 
@@ -134,11 +128,11 @@ then
 elif [ $1 == "-h" ]
 then
     echo "Usage: ./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf all.fastq sample_name"
-    echo "python3, minimap2, samtools, bedtools, featureCounts and salmon must be in your PATH"
+    echo "python3, minimap2, samtools, bedtools, featureCounts and NanoCount must be in your PATH"
 elif [ $# != 8 ]
 then
     echo "Usage: ./dRNA.sh sample_genome.fasta sample_transcriptome.fasta sample_annotation.gtf sequin_genome.fasta sequin_transcriptonme.fasta sequin_annotation.gtf all.fastq sample_name"
-    echo "python3, minimap2, samtools, bedtools, featureCounts and salmon must be in your PATH"
+    echo "python3, minimap2, samtools, bedtools, featureCounts and NanoCount must be in your PATH"
 else
     runSample
     runSequins
