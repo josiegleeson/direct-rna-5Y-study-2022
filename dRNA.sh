@@ -65,7 +65,7 @@ featureCounts -L -a $HANNOTATION -o $OUTPREF/quantifications/genomic-quant $OUTP
 
 echo "Performing transcript quantification"
 # Quantifying transcripts with NanoCount
-NanoCount -i $OUTPREF/alignments/transcriptomic-aln.bam $OUTPREF/alignments/transcriptomic-aln.bam -p align_score -3 100 --extra_tx_info --discard_suplementary -o $OUTPREF/quantifications/transcriptomic-quant.tsv
+NanoCount -i $OUTPREF/alignments/transcriptomic-aln.bam -p align_score -3 100 --extra_tx_info --discard_suplementary -o $OUTPREF/quantifications/transcriptomic-quant.tsv
 
 echo "Finished for sample"
 
