@@ -65,7 +65,7 @@ featureCounts -L -a $HANNOTATION -o $OUTPREF/quantifications/genomic-quant $OUTP
 
 echo "Performing transcript quantification"
 # Quantifying transcripts with NanoCount
-NanoCount -i $OUTPREF/alignments/transcriptomic-aln.bam -p align_score -3 100 --extra_tx_info --discard_suplementary -o $OUTPREF/quantifications/transcriptomic-quant.tsv
+NanoCount -i $OUTPREF/alignments/transcriptomic-aln.bam -p align_score -a --extra_tx_info -o $OUTPREF/quantifications/transcriptomic-quant.tsv
 
 echo "Finished for sample"
 
@@ -114,7 +114,7 @@ featureCounts -L -a $SANNOTATION -o $OUTPREF-sequins/quantifications/primary-gen
 
 echo "Performing transcript quantification"
 # Quantifying transcripts with NanoCount
-NanoCount -i $OUTPREF-sequins/alignments/transcriptomic-aln.bam -p align_score -3 100 --extra_tx_info --discard_suplementary -o $OUTPREF-sequins/quantifications/transcriptomic-quant.tsv
+NanoCount -i $OUTPREF-sequins/alignments/transcriptomic-aln.bam -p align_score -a --extra_tx_info -o $OUTPREF-sequins/quantifications/transcriptomic-quant.tsv
 
 echo "Finished for sequins"
 
