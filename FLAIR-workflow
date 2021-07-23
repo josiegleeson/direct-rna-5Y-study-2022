@@ -1,22 +1,23 @@
 # FLAIR (v1.4.0) was used to correct and collapse transcripts
-# Using bed12 files of primary genomic alignments only
-# bed12 created from BAMs using FLAIR script
+# Using bed12 files created from BAMs using FLAIR script
 
 # Correct mapped reads:
 # 5Y
 python flair/flair.py correct \
 -c GRCh38.chrom.sizes.tsv \
+-n \
 -f gencode.v31.annotation.gtf \
 -g hg38.fa \
--q 5y_primary.bed12 \
--o 5y_corrected
+-q 5y.bed12 \
+-o 5y
 
 # Sequins
 python flair/flair.py correct \
 -c sequin.chrom.sizes.tsv \
+-n \
 -f rnasequin_annotation_2.2.gtf \
 -g rnasequin_decoychr_2.2.fa \
--q sequin_primary.bed12 \
+-q sequins.bed12 \
 -o sequin_corrected
 
 
@@ -25,20 +26,23 @@ python flair/flair.py correct \
 # 5Y
 python flair/flair.py collapse \
 -s 5 \
--n \
+-p hg38.cage_peak_phase1and2combined_coord.bed \
+--stringent \
+--trust_ends \
 -f gencode.v31.annotation.gtf \
 -r 5Y_pass.fa \
--q 5Y_corrected.psl \
+-q 5Y_all_corrected.psl \
 -g hg38.fa \
 -o 5Y_collapsed
 
 # Sequins
 python flair/flair.py collapse \
 -s 5 \
--n \
+--stringent \
+--trust_ends \
 -f rnasequin_annotation.gtf \
 -r sequin_pass.fa \
--q sequin_corrected.psl \
+-q sequin_all_corrected.psl \
 -g rnasequin_decoychr.fa \
 -o sequin_collapsed
 
